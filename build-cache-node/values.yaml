@@ -1,0 +1,24 @@
+application:
+  name: build-cache-node
+  image: gradle/build-cache-node:12.5
+  port: 5071
+  requestMemory: 1Gi
+  requestCpu: 0.5
+  limitMemory: 2Gi
+  limitCpu: 1.5
+
+volume:
+  storagePV: "10Gi"
+  storagePVC: "10Gi"
+  storageClassName: 'standard'
+
+gitlab:
+  app: ""
+  env: ""
+
+
+service:
+  url: http://my.host.com/
+
+## Set istio gateway selector
+gatewaySelector: external-whitelisted

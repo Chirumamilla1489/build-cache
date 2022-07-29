@@ -1,0 +1,27 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: {{ .Values.application.name }}
+  labels:
+    app: "{{ .Values.application.name }}"
+  annotations:
+    {{ if .Values.gitlab.app }}app.gitlab.com/app: {{ .Values.gitlab.app | quote }}{{ end }}
+    {{ if .Values.gitlab.env }}app.gitlab.com/env: {{ .Values.gitlab.env | quote }}{{ end }}
+spec:
+  selector:
+    gateway: {{ .Values.gatewaySelector }}
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - {{ template "hostname" .Values.service.url }}
+      tls:
+        httpsRedirect: true
+    - port:
+        number: 443
+        name: https-443
+        protocol: HTTP
+      hosts:
+        - {{ template "hostname" .Values.service.url }}

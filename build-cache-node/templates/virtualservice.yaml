@@ -1,0 +1,29 @@
+---
+kind: VirtualService
+apiVersion: networking.istio.io/v1alpha3
+metadata:
+  name: {{ .Values.application.name}}
+  annotations:
+    {{ if .Values.gitlab.app }}app.gitlab.com/app: {{ .Values.gitlab.app | quote }}{{ end }}
+    {{ if .Values.gitlab.env }}app.gitlab.com/env: {{ .Values.gitlab.env | quote }}{{ end }}
+spec:
+  gateways:
+    - {{ .Values.application.name }}
+  hosts:
+    - {{ template "hostname" .Values.service.url }}
+  http:
+    - match:
+        - uri:
+            prefix: "/"
+      route:
+        - destination:
+            host: build-cache-node.{{ .Release.Namespace}}.svc.cluster.local
+            port:
+              number: 5071
+          weight: 100
+      headers:
+        request:
+          set:
+            "x-forwarded-proto": "https"
+            "x-forwarded-port": "443"
+

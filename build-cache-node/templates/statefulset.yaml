@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.application.name }}
+  labels:
+    app: {{ .Values.application.name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.application.name }}
+  serviceName: {{ .Values.application.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.application.name }}
+    spec:
+      containers:
+      - name: {{ .Values.application.name }}
+        image: {{ .Values.application.image }}
+        args: [ "start", "ui-access generated" ]
+        ports:
+        - containerPort: {{ .Values.application.port }}
+        resources:
+          requests:
+            memory: {{ .Values.application.requestMemory }}
+            cpu: {{ .Values.application.requestCpu }}
+          limits:
+            memory: {{ .Values.application.limitMemory }}
+            cpu: {{ .Values.application.limitCpu }}
+        env:
+        - name: EXCLUSIVE_VOLUME_SIZE
+          value: "10Gi"
+        volumeMounts:
+        - mountPath: /data_somthing
+          name: {{ .Values.application.name }}-volume
+      volumes:
+      - name: {{ .Values.application.name }}-volume
+        persistentVolumeClaim:
+          claimName: {{ .Values.application.name }}-pvc
